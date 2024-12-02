@@ -1,13 +1,51 @@
 'use client'
 
 import { useDroppable } from '@dnd-kit/core'
-import type { GameState, PieceType } from '@/types/game'
+import type { GameState, PieceType, Piece } from '@/types/game'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 
 type BoardProps = {
   gameState: GameState
+  previewPiece: Piece | null
+  previewPosition: { row: number; col: number } | null
 }
 
-export function Board({ gameState }: BoardProps) {
+export function Board({ gameState, previewPiece, previewPosition }: BoardProps) {
+  const [clearedCells, setClearedCells] = useState<{ row: number; col: number }[]>([])
+
+  useEffect(() => {
+    const newClearedCells: { row: number; col: number }[] = []
+    
+    // Check rows
+    for (let i = 0; i < gameState.board.length; i++) {
+      if (gameState.board[i].every(cell => cell !== null)) {
+        for (let j = 0; j < gameState.board[i].length; j++) {
+          newClearedCells.push({ row: i, col: j })
+        }
+      }
+    }
+
+    // Check columns
+    for (let j = 0; j < gameState.board[0].length; j++) {
+      if (gameState.board.every(row => row[j] !== null)) {
+        for (let i = 0; i < gameState.board.length; i++) {
+          newClearedCells.push({ row: i, col: j })
+        }
+      }
+    }
+
+    setClearedCells(newClearedCells)
+
+    if (newClearedCells.length > 0) {
+      const timer = setTimeout(() => {
+        setClearedCells([])
+      }, 500) // Duration of the clear animation
+
+      return () => clearTimeout(timer)
+    }
+  }, [gameState.board])
+
   const colors: { [key in PieceType]: string } = {
     I: 'bg-cyan-500',
     O: 'bg-yellow-500',
@@ -26,12 +64,28 @@ export function Board({ gameState }: BoardProps) {
             id: `cell-${i}-${j}`,
           })
 
+          const isPreview = previewPiece && previewPosition && 
+            i >= previewPosition.row && i < previewPosition.row + previewPiece.shape.length &&
+            j >= previewPosition.col && j < previewPosition.col + previewPiece.shape[0].length &&
+            previewPiece.shape[i - previewPosition.row][j - previewPosition.col]
+
+          const isCleared = clearedCells.some(clearedCell => clearedCell.row === i && clearedCell.col === j)
+
           return (
-            <div
-              key={`${i}-${j}`}
-              ref={setNodeRef}
-              className={`w-12 h-12 border border-gray-300 ${cell ? colors[cell] : 'bg-white'}`}
-            />
+            <AnimatePresence key={`${i}-${j}`}>
+              <motion.div
+                ref={setNodeRef}
+                className={`w-12 h-12 border border-gray-300 ${cell ? colors[cell] : 'bg-white'}`}
+                initial={isCleared ? { scale: 1 } : {}}
+                animate={isCleared ? { scale: 0 } : {}}
+                exit={isCleared ? { scale: 1 } : {}}
+                transition={{ duration: 0.5 }}
+              >
+                {isPreview && !cell && (
+                  <div className={`w-full h-full ${colors[previewPiece.type]} opacity-50`} />
+                )}
+              </motion.div>
+            </AnimatePresence>
           )
         })
       )}

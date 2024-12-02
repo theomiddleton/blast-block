@@ -63,11 +63,11 @@ export async function placePiece(
   return newState
 }
 
-function canPlacePiece(board: (PieceType | null)[][], piece: Piece, row: number, col: number): boolean {
+export async function canPlacePiece(board: (PieceType | null)[][], piece: Piece, row: number, col: number): boolean {
   for (let i = 0; i < piece.shape.length; i++) {
     for (let j = 0; j < piece.shape[i].length; j++) {
       if (piece.shape[i][j]) {
-        if (row + i >= BOARD_SIZE || col + j >= BOARD_SIZE || board[row + i][col + j] !== null) {
+        if (row + i >= board.length || col + j >= board[0].length || board[row + i][col + j] !== null) {
           return false
         }
       }

@@ -48,18 +48,20 @@ function DraggablePiece({ piece, onPieceSelect }: { piece: Piece; onPieceSelect:
       className="cursor-move"
       onClick={() => onPieceSelect(piece)}
     >
-      {piece.shape.map((row, i) => (
-        <div key={i} className="flex">
-          {row.map((cell, j) => (
-            <div
-              key={j}
-              className={`w-8 h-8 border border-gray-300 ${
-                cell ? colors[piece.type] : 'bg-transparent'
-              }`}
-            />
-          ))}
-        </div>
-      ))}
+      <div className="flex flex-col">
+        {piece.shape.map((row, i) => (
+          <div key={i} className="flex">
+            {row.map((cell, j) => (
+              cell ? (
+                <div
+                  key={j}
+                  className={`w-8 h-8 border border-gray-300 ${colors[piece.type]}`}
+                />
+              ) : null
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

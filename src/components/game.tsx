@@ -1,15 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DndContext, DragEndEvent } from '@dnd-kit/core'
+import { DndContext, DragEndEvent, DragOverEvent } from '@dnd-kit/core'
 import type { GameState, Piece } from '@/types/game'
 import { Board } from '@/components/board'
 import { PieceSelection } from '@/components/piece-selection'
-import { initializeGame, placePiece } from '@/actions/game-actions'
-
+import { initializeGame, placePiece, canPlacePiece } from '@/actions/game-actions'
 
 export function Game() {
   const [gameState, setGameState] = useState<GameState | null>(null)
+  const [previewPiece, setPreviewPiece] = useState<Piece | null>(null)
+  const [previewPosition, setPreviewPosition] = useState<{ row: number; col: number } | null>(null)
 
   useEffect(() => {
     async function initGame() {
@@ -19,6 +20,21 @@ export function Game() {
     initGame()
   }, [])
 
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event
+
+    if (over && active.data.current && over.id.toString().startsWith('cell-')) {
+      const piece = active.data.current as Piece
+      const [row, col] = over.id.toString().split('-').slice(1).map(Number)
+
+      setPreviewPiece(piece)
+      setPreviewPosition({ row, col })
+    } else {
+      setPreviewPiece(null)
+      setPreviewPosition(null)
+    }
+  }
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
 
@@ -26,11 +42,14 @@ export function Game() {
       const piece = active.data.current as Piece
       const [row, col] = over.id.toString().split('-').slice(1).map(Number)
 
-      if (gameState) {
+      if (gameState && canPlacePiece(gameState.board, piece, row, col)) {
         const newState = await placePiece(gameState, piece, row, col)
         setGameState(newState)
       }
     }
+
+    setPreviewPiece(null)
+    setPreviewPosition(null)
   }
 
   const handlePieceSelect = (piece: Piece) => {
@@ -47,11 +66,11 @@ export function Game() {
   }
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
       <div className="flex flex-col items-center space-y-4">
         <h1 className="text-3xl font-bold">Blast Block</h1>
         <div className="text-xl">Score: {gameState.score}</div>
-        <Board gameState={gameState} />
+        <Board gameState={gameState} previewPiece={previewPiece} previewPosition={previewPosition} />
         <PieceSelection pieces={gameState.availablePieces} onPieceSelect={handlePieceSelect} />
         {gameState.gameOver && (
           <div className="text-2xl font-bold text-red-500">Game Over!</div>

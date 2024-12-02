@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Piece } from '@/types/game'
+import type { Piece } from '@/types/game'
 
 interface DraggablePieceProps {
   piece: Piece
