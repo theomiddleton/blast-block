@@ -8,7 +8,8 @@ export async function initializeGame(): Promise<GameState> {
     board: Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null)),
     score: 0,
     availablePieces: generatePieces(),
-    gameOver: false
+    gameOver: false,
+    highScore: 0
   }
 }
 
@@ -49,6 +50,10 @@ export async function placePiece(
   newState.score += calculateScore(clearedLines)
   newState.gameOver = isGameOver(newState.board, newState.availablePieces)
 
+  if (newState.gameOver) {
+    newState.highScore = Math.max(newState.score, newState.highScore)
+  }
+
   return newState
 }
 
@@ -56,16 +61,13 @@ export async function canPlacePiece(board: (PieceType | null)[][], piece: Piece,
   for (let i = 0; i < piece.shape.length; i++) {
     for (let j = 0; j < piece.shape[i].length; j++) {
       if (piece.shape[i][j]) {
-        if (row + i < 0 || row + i >= BOARD_SIZE || col + j < 0 || col + j >= BOARD_SIZE) {
-          return false // Off the board
-        }
-        if (board[row + i][col + j] !== null) {
-          return false // Overlapping with an existing piece
+        if (row + i < 0 || row + i >= BOARD_SIZE || col + j < 0 || col + j >= BOARD_SIZE || board[row + i][col + j] !== null) {
+          return false
         }
       }
     }
   }
-  return true;
+  return true
 }
 
 function clearLines(board: (PieceType | null)[][]): number {
