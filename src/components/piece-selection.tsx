@@ -6,20 +6,19 @@ import type { Piece } from '@/types/game'
 
 type PieceSelectionProps = {
   pieces: Piece[]
-  onPieceSelect: (piece: Piece) => void
 }
 
-export function PieceSelection({ pieces, onPieceSelect }: PieceSelectionProps) {
+export function PieceSelection({ pieces }: PieceSelectionProps) {
   return (
     <div className="flex space-x-4">
       {pieces.map((piece, index) => (
-        <DraggablePiece key={`piece-${piece.type}-${index}`} piece={piece} onPieceSelect={onPieceSelect} />
+        <DraggablePiece key={`piece-${piece.type}-${index}`} piece={piece} />
       ))}
     </div>
   )
 }
 
-function DraggablePiece({ piece, onPieceSelect }: { piece: Piece; onPieceSelect: (piece: Piece) => void }) {
+function DraggablePiece({ piece }: { piece: Piece }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: `piece-${piece.type}`,
     data: piece,
@@ -34,7 +33,7 @@ function DraggablePiece({ piece, onPieceSelect }: { piece: Piece; onPieceSelect:
     O: 'bg-yellow-500',
     T: 'bg-purple-500',
     S: 'bg-green-500',
-    Z: 'bg-red-500',
+    Z: 'bg-bg-red-500',
     J: 'bg-blue-500',
     L: 'bg-orange-500'
   }
@@ -46,7 +45,6 @@ function DraggablePiece({ piece, onPieceSelect }: { piece: Piece; onPieceSelect:
       {...listeners} 
       {...attributes}
       className="cursor-move"
-      onClick={() => onPieceSelect(piece)}
     >
       <div className="flex flex-col">
         {piece.shape.map((row, i) => (

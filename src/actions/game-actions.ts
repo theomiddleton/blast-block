@@ -52,12 +52,13 @@ export async function placePiece(
     }
   }
 
-  newState.availablePieces = newState.availablePieces.filter(p => p.type !== piece.type)
+  newState.availablePieces = newState.availablePieces.filter(p => p !== piece)
   if (newState.availablePieces.length === 0) {
     newState.availablePieces = generatePieces()
   }
 
-  newState.score += clearLines(newState.board)
+  const clearedLines = clearLines(newState.board)
+  newState.score += calculateScore(clearedLines)
   newState.gameOver = isGameOver(newState.board, newState.availablePieces)
 
   return newState
@@ -67,7 +68,7 @@ export async function canPlacePiece(board: (PieceType | null)[][], piece: Piece,
   for (let i = 0; i < piece.shape.length; i++) {
     for (let j = 0; j < piece.shape[i].length; j++) {
       if (piece.shape[i][j]) {
-        if (row + i >= board.length || col + j >= board[0].length || board[row + i][col + j] !== null) {
+        if (row + i >= BOARD_SIZE || col + j >= BOARD_SIZE || board[row + i][col + j] !== null) {
           return false
         }
       }
@@ -77,7 +78,7 @@ export async function canPlacePiece(board: (PieceType | null)[][], piece: Piece,
 }
 
 function clearLines(board: (PieceType | null)[][]): number {
-  let score = 0
+  let linesCleared = 0
   const rowsToRemove: number[] = []
   const colsToRemove: number[] = []
 
@@ -85,6 +86,7 @@ function clearLines(board: (PieceType | null)[][]): number {
   for (let i = 0; i < BOARD_SIZE; i++) {
     if (board[i].every(cell => cell !== null)) {
       rowsToRemove.push(i)
+      linesCleared++
     }
   }
 
@@ -92,13 +94,13 @@ function clearLines(board: (PieceType | null)[][]): number {
   for (let j = 0; j < BOARD_SIZE; j++) {
     if (board.every(row => row[j] !== null)) {
       colsToRemove.push(j)
+      linesCleared++
     }
   }
 
   // Remove rows
   rowsToRemove.forEach(row => {
     board[row] = Array(BOARD_SIZE).fill(null)
-    score += BOARD_SIZE
   })
 
   // Remove columns
@@ -106,9 +108,16 @@ function clearLines(board: (PieceType | null)[][]): number {
     for (let i = 0; i < BOARD_SIZE; i++) {
       board[i][col] = null
     }
-    score += BOARD_SIZE
   })
 
+  return linesCleared
+}
+
+function calculateScore(linesCleared: number): number {
+  let score = linesCleared * BOARD_SIZE * 10 // Base score for cleared lines
+  if (linesCleared === BOARD_SIZE * 2) { // Full board clear (all rows and columns)
+    score *= 2 // Double the score for a full board clear
+  }
   return score
 }
 

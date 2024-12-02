@@ -52,10 +52,6 @@ export function Game() {
     setPreviewPosition(null)
   }
 
-  const handlePieceSelect = (piece: Piece) => {
-    // This function is no longer needed for drag and drop, but you can keep it if you want to implement click-to-select functionality
-  }
-
   const handleRestart = async () => {
     const newState = await initializeGame()
     setGameState(newState)
@@ -71,7 +67,7 @@ export function Game() {
         <h1 className="text-3xl font-bold">Blast Block</h1>
         <div className="text-xl">Score: {gameState.score}</div>
         <Board gameState={gameState} previewPiece={previewPiece} previewPosition={previewPosition} />
-        <PieceSelection pieces={gameState.availablePieces} onPieceSelect={handlePieceSelect} />
+        <PieceSelection pieces={gameState.availablePieces} />
         {gameState.gameOver && (
           <div className="text-2xl font-bold text-red-500">Game Over!</div>
         )}
