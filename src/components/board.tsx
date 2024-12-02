@@ -18,7 +18,19 @@ export function Board({ gameState, previewPiece, previewPosition, canPlace }: Bo
     S: 'bg-green-500',
     Z: 'bg-red-500',
     J: 'bg-blue-500',
-    L: 'bg-orange-500'
+    L: 'bg-orange-500',
+    I_VERT: 'bg-cyan-500',
+    T_INV: 'bg-purple-500',
+    S_VERT: 'bg-green-500',
+    Z_VERT: 'bg-red-500',
+    J_INV: 'bg-blue-500',
+    L_INV: 'bg-orange-500',
+    SMALL: 'bg-gray-500',
+    MEDIUM: 'bg-gray-600',
+    LARGE: 'bg-gray-700',
+    SQUARE: 'bg-yellow-600',
+    L_SMALL: 'bg-orange-600',
+    T_SMALL: 'bg-purple-600'
   }
 
   return (

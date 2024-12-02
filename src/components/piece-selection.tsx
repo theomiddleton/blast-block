@@ -3,6 +3,7 @@
 import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import type { Piece } from '@/types/game'
+import { colors } from '@/constants/shapes'
 
 type PieceSelectionProps = {
   pieces: Piece[]
@@ -28,16 +29,6 @@ function DraggablePiece({ piece, id }: { piece: Piece; id: string }) {
     transform: CSS.Translate.toString(transform),
   } : undefined
 
-  const colors: { [key: string]: string } = {
-    I: 'bg-cyan-500',
-    O: 'bg-yellow-500',
-    T: 'bg-purple-500',
-    S: 'bg-green-500',
-    Z: 'bg-red-500',
-    J: 'bg-blue-500',
-    L: 'bg-orange-500'
-  }
-
   return (
     <div 
       ref={setNodeRef} 
@@ -61,4 +52,3 @@ function DraggablePiece({ piece, id }: { piece: Piece; id: string }) {
     </div>
   )
 }
-

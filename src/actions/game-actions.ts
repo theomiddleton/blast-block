@@ -115,15 +115,88 @@ function calculateScore(linesCleared: number): number {
 }
 
 function isGameOver(board: (PieceType | null)[][], availablePieces: Piece[]): boolean {
+  // Check if any single piece can be placed
   for (let piece of availablePieces) {
-    for (let i = 0; i < BOARD_SIZE; i++) {
-      for (let j = 0; j < BOARD_SIZE; j++) {
-        if (canPlacePiece(board, piece, i, j)) {
+    if (canPlaceAnywhere(board, piece)) {
+      return false
+    }
+  }
+
+  // Check if any combination of two pieces can be placed
+  for (let i = 0; i < availablePieces.length; i++) {
+    for (let j = i + 1; j < availablePieces.length; j++) {
+      if (canPlaceTwoPieces(board, availablePieces[i], availablePieces[j])) {
+        return false
+      }
+    }
+  }
+
+  // Check if any combination of three pieces can be placed
+  for (let i = 0; i < availablePieces.length; i++) {
+    for (let j = i + 1; j < availablePieces.length; j++) {
+      for (let k = j + 1; k < availablePieces.length; k++) {
+        if (canPlaceThreePieces(board, availablePieces[i], availablePieces[j], availablePieces[k])) {
           return false
         }
       }
     }
   }
+
   return true
+}
+
+function canPlaceAnywhere(board: (PieceType | null)[][], piece: Piece): boolean {
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    for (let j = 0; j < BOARD_SIZE; j++) {
+      if (canPlacePiece(board, piece, i, j)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+function canPlaceTwoPieces(board: (PieceType | null)[][], piece1: Piece, piece2: Piece): boolean {
+  const tempBoard = JSON.parse(JSON.stringify(board))
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    for (let j = 0; j < BOARD_SIZE; j++) {
+      if (canPlacePiece(tempBoard, piece1, i, j)) {
+        placePieceOnBoard(tempBoard, piece1, i, j)
+        if (canPlaceAnywhere(tempBoard, piece2)) {
+          return true
+        }
+        // Reset the board for the next iteration
+        tempBoard[i][j] = null
+      }
+    }
+  }
+  return false
+}
+
+function canPlaceThreePieces(board: (PieceType | null)[][], piece1: Piece, piece2: Piece, piece3: Piece): boolean {
+  const tempBoard = JSON.parse(JSON.stringify(board))
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    for (let j = 0; j < BOARD_SIZE; j++) {
+      if (canPlacePiece(tempBoard, piece1, i, j)) {
+        placePieceOnBoard(tempBoard, piece1, i, j)
+        if (canPlaceTwoPieces(tempBoard, piece2, piece3)) {
+          return true
+        }
+        // Reset the board for the next iteration
+        tempBoard[i][j] = null
+      }
+    }
+  }
+  return false
+}
+
+function placePieceOnBoard(board: (PieceType | null)[][], piece: Piece, row: number, col: number): void {
+  for (let i = 0; i < piece.shape.length; i++) {
+    for (let j = 0; j < piece.shape[i].length; j++) {
+      if (piece.shape[i][j]) {
+        board[row + i][col + j] = piece.type
+      }
+    }
+  }
 }
 

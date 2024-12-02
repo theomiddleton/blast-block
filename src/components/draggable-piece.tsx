@@ -1,6 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Piece } from '@/types/game'
+import { colors } from '@/constants/shapes' 
 
 interface DraggablePieceProps {
   piece: Piece
@@ -21,16 +22,6 @@ export function DraggablePiece({ piece, id }: DraggablePieceProps) {
     transition,
   }
 
-  const colors: { [key: string]: string } = {
-    I: 'bg-cyan-500',
-    O: 'bg-yellow-500',
-    T: 'bg-purple-500',
-    S: 'bg-green-500',
-    Z: 'bg-red-500',
-    J: 'bg-blue-500',
-    L: 'bg-orange-500'
-  }
-
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-move">
       {piece.shape.map((row, i) => (
@@ -48,4 +39,3 @@ export function DraggablePiece({ piece, id }: DraggablePieceProps) {
     </div>
   )
 }
-

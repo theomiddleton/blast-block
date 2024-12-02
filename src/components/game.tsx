@@ -12,11 +12,13 @@ export function Game() {
   const [previewPiece, setPreviewPiece] = useState<Piece | null>(null)
   const [previewPosition, setPreviewPosition] = useState<{ row: number; col: number } | null>(null)
   const [canPlace, setCanPlace] = useState<boolean>(false)
+  const [highScore, setHighScore] = useState<number>(0)
 
   useEffect(() => {
     async function initGame() {
       const initialState = await initializeGame()
       setGameState(initialState)
+      setHighScore(initialState.highScore)
     }
     initGame()
   }, [])
@@ -32,6 +34,16 @@ export function Game() {
     }
     checkPlacement()
   }, [gameState, previewPiece, previewPosition])
+
+  useEffect(() => {
+    if (gameState && gameState.gameOver) {
+      if (gameState.score > highScore) {
+        setHighScore(gameState.score)
+      }
+      alert(`Game Over! Your score: ${gameState.score}`)
+      handleRestart()
+    }
+  }, [gameState, highScore])
 
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event
@@ -67,6 +79,7 @@ export function Game() {
 
   const handleRestart = async () => {
     const newState = await initializeGame()
+    newState.highScore = highScore
     setGameState(newState)
   }
 
@@ -79,6 +92,7 @@ export function Game() {
       <div className="flex flex-col items-center space-y-4">
         <h1 className="text-3xl font-bold">Blast Block</h1>
         <div className="text-xl">Score: {gameState.score}</div>
+        <div className="text-xl">High Score: {highScore}</div>
         <Board 
           gameState={gameState} 
           previewPiece={previewPiece} 
@@ -86,9 +100,6 @@ export function Game() {
           canPlace={canPlace}
         />
         <PieceSelection pieces={gameState.availablePieces} />
-        {gameState.gameOver && (
-          <div className="text-2xl font-bold text-red-500">Game Over!</div>
-        )}
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           onClick={handleRestart}
