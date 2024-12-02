@@ -2,7 +2,6 @@
 
 import { useDroppable } from '@dnd-kit/core'
 import type { GameState, PieceType, Piece } from '@/types/game'
-import { useState, useEffect } from 'react'
 
 type BoardProps = {
   gameState: GameState
@@ -12,55 +11,6 @@ type BoardProps = {
 }
 
 export function Board({ gameState, previewPiece, previewPosition, canPlace }: BoardProps) {
-  const [clearedCells, setClearedCells] = useState<{ row: number; col: number }[]>([])
-  const [placedCells, setPlacedCells] = useState<{ row: number; col: number }[]>([])
-
-  useEffect(() => {
-    const newClearedCells: { row: number; col: number }[] = []
-    
-    // Check rows
-    for (let i = 0; i < gameState.board.length; i++) {
-      if (gameState.board[i].every(cell => cell !== null)) {
-        for (let j = 0; j < gameState.board[i].length; j++) {
-          newClearedCells.push({ row: i, col: j })
-        }
-      }
-    }
-
-    // Check columns
-    for (let j = 0; j < gameState.board[0].length; j++) {
-      if (gameState.board.every(row => row[j] !== null)) {
-        for (let i = 0; i < gameState.board.length; i++) {
-          newClearedCells.push({ row: i, col: j })
-        }
-      }
-    }
-
-    setClearedCells(newClearedCells)
-
-    if (newClearedCells.length > 0) {
-      const timer = setTimeout(() => {
-        setClearedCells([])
-      }, 500) // Duration of the clear animation
-
-      return () => clearTimeout(timer)
-    }
-  }, [gameState.board])
-
-  useEffect(() => {
-    const newPlacedCells: { row: number; col: number }[] = []
-    
-    for (let i = 0; i < gameState.board.length; i++) {
-      for (let j = 0; j < gameState.board[i].length; j++) {
-        if (gameState.board[i][j] !== null && !clearedCells.some(cell => cell.row === i && cell.col === j)) {
-          newPlacedCells.push({ row: i, col: j })
-        }
-      }
-    }
-
-    setPlacedCells(newPlacedCells)
-  }, [gameState.board, clearedCells])
-
   const colors: { [key in PieceType]: string } = {
     I: 'bg-cyan-500',
     O: 'bg-yellow-500',
@@ -84,9 +34,6 @@ export function Board({ gameState, previewPiece, previewPosition, canPlace }: Bo
             j >= previewPosition.col && j < previewPosition.col + previewPiece.shape[0].length &&
             previewPiece.shape[i - previewPosition.row][j - previewPosition.col]
 
-          const isCleared = clearedCells.some(clearedCell => clearedCell.row === i && clearedCell.col === j)
-          const isPlaced = placedCells.some(placedCell => placedCell.row === i && placedCell.col === j)
-
           return (
             <div
               key={`${i}-${j}`}
@@ -94,7 +41,7 @@ export function Board({ gameState, previewPiece, previewPosition, canPlace }: Bo
               className={`w-12 h-12 border border-gray-300 ${cell ? colors[cell] : 'bg-white'}`}
             >
               {isPreview && !cell && (
-                <div className={`w-full h-full ${colors[previewPiece.type]} ${canPlace ? 'opacity-50' : 'opacity-25 bg-red-500'}`} />
+                <div className={`w-full h-full ${canPlace ? colors[previewPiece.type] : 'bg-red-500'} ${canPlace ? 'opacity-50' : 'opacity-25'}`} />
               )}
             </div>
           )

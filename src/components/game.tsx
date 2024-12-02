@@ -24,8 +24,8 @@ export function Game() {
   useEffect(() => {
     async function checkPlacement() {
       if (gameState && previewPiece && previewPosition) {
-        const result = await canPlacePiece(gameState.board, previewPiece, previewPosition.row, previewPosition.col)
-        setCanPlace(result)
+        const isValid = await canPlacePiece(gameState.board, previewPiece, previewPosition.row, previewPosition.col)
+        setCanPlace(isValid)
       } else {
         setCanPlace(false)
       }

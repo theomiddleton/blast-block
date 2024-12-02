@@ -16,7 +16,7 @@ function generatePieces(): Piece[] {
   const pieceTypes = Object.keys(PIECES) as PieceType[]
   return Array(PIECES_PER_TURN).fill(null).map(() => {
     const type = pieceTypes[Math.floor(Math.random() * pieceTypes.length)] as PieceType
-    return { type, shape: PIECES[type] }
+    return { id: Math.random().toString(36).substr(2, 9), type, shape: PIECES[type] }
   })
 }
 
@@ -40,7 +40,7 @@ export async function placePiece(
     }
   }
 
-  newState.availablePieces = newState.availablePieces.filter(p => p !== piece)
+  newState.availablePieces = newState.availablePieces.filter(p => p.id !== piece.id)
   if (newState.availablePieces.length === 0) {
     newState.availablePieces = generatePieces()
   }
@@ -52,17 +52,20 @@ export async function placePiece(
   return newState
 }
 
-export async function canPlacePiece(board: (PieceType | null)[][], piece: Piece, row: number, col: number): boolean {
+export async function canPlacePiece(board: (PieceType | null)[][], piece: Piece, row: number, col: number): Promise<boolean> {
   for (let i = 0; i < piece.shape.length; i++) {
     for (let j = 0; j < piece.shape[i].length; j++) {
       if (piece.shape[i][j]) {
-        if (row + i >= BOARD_SIZE || col + j >= BOARD_SIZE || board[row + i][col + j] !== null) {
-          return false
+        if (row + i < 0 || row + i >= BOARD_SIZE || col + j < 0 || col + j >= BOARD_SIZE) {
+          return false // Off the board
+        }
+        if (board[row + i][col + j] !== null) {
+          return false // Overlapping with an existing piece
         }
       }
     }
   }
-  return true
+  return true;
 }
 
 function clearLines(board: (PieceType | null)[][]): number {
