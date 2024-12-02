@@ -27,7 +27,7 @@ export const PIECES: { [key in PieceType]: boolean[][] } = {
 export const BOARD_SIZE = 8
 export const PIECES_PER_TURN = 3
 
-export const colors: { [key: string]: string } = {
+export const colours: { [key: string]: string } = {
   I: 'bg-cyan-500',
   O: 'bg-yellow-500',
   T: 'bg-purple-500',

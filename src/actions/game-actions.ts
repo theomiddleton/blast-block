@@ -29,7 +29,7 @@ export async function placePiece(
 ): Promise<GameState> {
   const newState = JSON.parse(JSON.stringify(state)) as GameState
 
-  if (!canPlacePiece(newState.board, piece, row, col)) {
+  if (!(await canPlacePiece(newState.board, piece, row, col))) {
     return newState
   }
 

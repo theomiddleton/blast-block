@@ -10,7 +10,7 @@ import { initializeGame, placePiece, canPlacePiece } from '@/actions/game-action
 export function Game() {
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [previewPiece, setPreviewPiece] = useState<Piece | null>(null)
-  const [previewPosition, setPreviewPosition] = useState<{ row: number; col: number } | null>(null)
+  const [previewPosition, setPreviewPosition] = useState<{ row: number, col: number } | null>(null)
   const [canPlace, setCanPlace] = useState<boolean>(false)
   const [highScore, setHighScore] = useState<number>(0)
 

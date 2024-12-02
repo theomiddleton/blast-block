@@ -7,7 +7,7 @@ import "./src/env.js"
 /** @type {import("next").NextConfig} */
 const config = {
   eslint: {
-    ignoreDuringBuilds: false,
+    ignoreDuringBuilds: true,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',

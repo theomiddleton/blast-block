@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Piece } from '@/types/game'
-import { colors } from '@/constants/shapes' 
+import { colours } from '@/constants/shapes'
 
 interface DraggablePieceProps {
   piece: Piece
@@ -9,13 +9,8 @@ interface DraggablePieceProps {
 }
 
 export function DraggablePiece({ piece, id }: DraggablePieceProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id })
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -23,14 +18,20 @@ export function DraggablePiece({ piece, id }: DraggablePieceProps) {
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-move">
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className='cursor-move'
+    >
       {piece.shape.map((row, i) => (
-        <div key={i} className="flex">
+        <div key={i} className='flex'>
           {row.map((cell, j) => (
             <div
               key={j}
-              className={`w-4 h-4 border border-gray-300 ${
-                cell ? colors[piece.type] : 'bg-transparent'
+              className={`h-4 w-4 border border-gray-300 ${
+                cell ? colours[piece.type] : 'bg-transparent'
               }`}
             />
           ))}
