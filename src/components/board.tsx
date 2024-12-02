@@ -1,13 +1,13 @@
 'use client'
 
+import { useDroppable } from '@dnd-kit/core'
 import type { GameState, PieceType } from '@/types/game'
 
 type BoardProps = {
   gameState: GameState
-  onCellClick: (row: number, col: number) => void
 }
 
-export function Board({ gameState, onCellClick }: BoardProps) {
+export function Board({ gameState }: BoardProps) {
   const colors: { [key in PieceType]: string } = {
     I: 'bg-cyan-500',
     O: 'bg-yellow-500',
@@ -21,13 +21,19 @@ export function Board({ gameState, onCellClick }: BoardProps) {
   return (
     <div className="grid grid-cols-8 gap-1 p-2 bg-gray-200 rounded">
       {gameState.board.map((row, i) =>
-        row.map((cell, j) => (
-          <div
-            key={`${i}-${j}`}
-            className={`w-8 h-8 border border-gray-300 ${cell ? colors[cell] : 'bg-white'}`}
-            onClick={() => onCellClick(i, j)}
-          />
-        ))
+        row.map((cell, j) => {
+          const { setNodeRef } = useDroppable({
+            id: `cell-${i}-${j}`,
+          })
+
+          return (
+            <div
+              key={`${i}-${j}`}
+              ref={setNodeRef}
+              className={`w-12 h-12 border border-gray-300 ${cell ? colors[cell] : 'bg-white'}`}
+            />
+          )
+        })
       )}
     </div>
   )

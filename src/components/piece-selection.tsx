@@ -1,13 +1,34 @@
 'use client'
 
+import { useDraggable } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
 import type { Piece } from '@/types/game'
 
 type PieceSelectionProps = {
   pieces: Piece[]
-  onPieceSelect: (index: number) => void
+  onPieceSelect: (piece: Piece) => void
 }
 
 export function PieceSelection({ pieces, onPieceSelect }: PieceSelectionProps) {
+  return (
+    <div className="flex space-x-4">
+      {pieces.map((piece, index) => (
+        <DraggablePiece key={`piece-${piece.type}-${index}`} piece={piece} onPieceSelect={onPieceSelect} />
+      ))}
+    </div>
+  )
+}
+
+function DraggablePiece({ piece, onPieceSelect }: { piece: Piece; onPieceSelect: (piece: Piece) => void }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: `piece-${piece.type}`,
+    data: piece,
+  })
+
+  const style = transform ? {
+    transform: CSS.Translate.toString(transform),
+  } : undefined
+
   const colors: { [key: string]: string } = {
     I: 'bg-cyan-500',
     O: 'bg-yellow-500',
@@ -19,20 +40,23 @@ export function PieceSelection({ pieces, onPieceSelect }: PieceSelectionProps) {
   }
 
   return (
-    <div className="flex space-x-4">
-      {pieces.map((piece, index) => (
-        <div key={index} className="cursor-pointer" onClick={() => onPieceSelect(index)}>
-          {piece.shape.map((row, i) => (
-            <div key={i} className="flex">
-              {row.map((cell, j) => (
-                <div
-                  key={j}
-                  className={`w-4 h-4 border border-gray-300 ${
-                    cell ? colors[piece.type] : 'bg-transparent'
-                  }`}
-                />
-              ))}
-            </div>
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      {...listeners} 
+      {...attributes}
+      className="cursor-move"
+      onClick={() => onPieceSelect(piece)}
+    >
+      {piece.shape.map((row, i) => (
+        <div key={i} className="flex">
+          {row.map((cell, j) => (
+            <div
+              key={j}
+              className={`w-8 h-8 border border-gray-300 ${
+                cell ? colors[piece.type] : 'bg-transparent'
+              }`}
+            />
           ))}
         </div>
       ))}

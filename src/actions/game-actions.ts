@@ -27,19 +27,18 @@ export async function initializeGame(): Promise<GameState> {
 function generatePieces(): Piece[] {
   const pieceTypes = Object.keys(PIECES) as PieceType[]
   return Array(PIECES_PER_TURN).fill(null).map(() => {
-    const type = pieceTypes[Math.floor(Math.random() * pieceTypes.length)]
-    return { type, shape: PIECES[type] } as Piece
+    const type = pieceTypes[Math.floor(Math.random() * pieceTypes.length)] as PieceType
+    return { type, shape: PIECES[type] }
   })
 }
 
 export async function placePiece(
   state: GameState,
-  pieceIndex: number,
+  piece: Piece,
   row: number,
   col: number
 ): Promise<GameState> {
   const newState = JSON.parse(JSON.stringify(state)) as GameState
-  const piece = newState.availablePieces[pieceIndex]
 
   if (!canPlacePiece(newState.board, piece, row, col)) {
     return newState
@@ -53,7 +52,7 @@ export async function placePiece(
     }
   }
 
-  newState.availablePieces.splice(pieceIndex, 1)
+  newState.availablePieces = newState.availablePieces.filter(p => p.type !== piece.type)
   if (newState.availablePieces.length === 0) {
     newState.availablePieces = generatePieces()
   }
