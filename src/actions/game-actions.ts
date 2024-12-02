@@ -1,19 +1,7 @@
 'use server'
 
 import type { GameState, Piece, PieceType } from '@/types/game'
-
-const BOARD_SIZE = 8
-const PIECES_PER_TURN = 3
-
-const PIECES: { [key in PieceType]: boolean[][] } = {
-  I: [[true, true, true, true]],
-  O: [[true, true], [true, true]],
-  T: [[true, true, true], [false, true, false]],
-  S: [[false, true, true], [true, true, false]],
-  Z: [[true, true, false], [false, true, true]],
-  J: [[true, false, false], [true, true, true]],
-  L: [[false, false, true], [true, true, true]]
-}
+import { PIECES, BOARD_SIZE, PIECES_PER_TURN } from '@/constants/shapes'
 
 export async function initializeGame(): Promise<GameState> {
   return {

@@ -11,6 +11,7 @@ export function Game() {
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [previewPiece, setPreviewPiece] = useState<Piece | null>(null)
   const [previewPosition, setPreviewPosition] = useState<{ row: number; col: number } | null>(null)
+  const [canPlace, setCanPlace] = useState<boolean>(false)
 
   useEffect(() => {
     async function initGame() {
@@ -19,6 +20,18 @@ export function Game() {
     }
     initGame()
   }, [])
+
+  useEffect(() => {
+    async function checkPlacement() {
+      if (gameState && previewPiece && previewPosition) {
+        const result = await canPlacePiece(gameState.board, previewPiece, previewPosition.row, previewPosition.col)
+        setCanPlace(result)
+      } else {
+        setCanPlace(false)
+      }
+    }
+    checkPlacement()
+  }, [gameState, previewPiece, previewPosition])
 
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event
@@ -42,7 +55,7 @@ export function Game() {
       const piece = active.data.current as Piece
       const [row, col] = over.id.toString().split('-').slice(1).map(Number)
 
-      if (gameState && canPlacePiece(gameState.board, piece, row, col)) {
+      if (gameState && canPlace) {
         const newState = await placePiece(gameState, piece, row, col)
         setGameState(newState)
       }
@@ -66,7 +79,12 @@ export function Game() {
       <div className="flex flex-col items-center space-y-4">
         <h1 className="text-3xl font-bold">Blast Block</h1>
         <div className="text-xl">Score: {gameState.score}</div>
-        <Board gameState={gameState} previewPiece={previewPiece} previewPosition={previewPosition} />
+        <Board 
+          gameState={gameState} 
+          previewPiece={previewPiece} 
+          previewPosition={previewPosition}
+          canPlace={canPlace}
+        />
         <PieceSelection pieces={gameState.availablePieces} />
         {gameState.gameOver && (
           <div className="text-2xl font-bold text-red-500">Game Over!</div>

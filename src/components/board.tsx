@@ -3,15 +3,15 @@
 import { useDroppable } from '@dnd-kit/core'
 import type { GameState, PieceType, Piece } from '@/types/game'
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
 
 type BoardProps = {
   gameState: GameState
   previewPiece: Piece | null
   previewPosition: { row: number; col: number } | null
+  canPlace: boolean
 }
 
-export function Board({ gameState, previewPiece, previewPosition }: BoardProps) {
+export function Board({ gameState, previewPiece, previewPosition, canPlace }: BoardProps) {
   const [clearedCells, setClearedCells] = useState<{ row: number; col: number }[]>([])
   const [placedCells, setPlacedCells] = useState<{ row: number; col: number }[]>([])
 
@@ -88,19 +88,15 @@ export function Board({ gameState, previewPiece, previewPosition }: BoardProps) 
           const isPlaced = placedCells.some(placedCell => placedCell.row === i && placedCell.col === j)
 
           return (
-            <motion.div
+            <div
               key={`${i}-${j}`}
               ref={setNodeRef}
               className={`w-12 h-12 border border-gray-300 ${cell ? colors[cell] : 'bg-white'}`}
-              initial={isPlaced ? { scale: 0 } : {}}
-              animate={isPlaced ? { scale: 1 } : {}}
-              exit={isCleared ? { scale: 0, opacity: 0 } : {}}
-              transition={{ duration: 0.3 }}
             >
               {isPreview && !cell && (
-                <div className={`w-full h-full ${colors[previewPiece.type]} opacity-50`} />
+                <div className={`w-full h-full ${colors[previewPiece.type]} ${canPlace ? 'opacity-50' : 'opacity-25 bg-red-500'}`} />
               )}
-            </motion.div>
+            </div>
           )
         })
       )}
